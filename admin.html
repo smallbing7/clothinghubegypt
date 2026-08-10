@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Dashboard | Clothing Hub Egypt</title>
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="wrap">
+    <section id="loginPanel" class="panel">
+      <h1>Admin Login</h1>
+      <p class="muted">Clothing Hub Egypt</p>
+      <form id="loginForm">
+        <label>Email<input id="email" type="email" required autocomplete="email"></label>
+        <label>Password<input id="password" type="password" required autocomplete="current-password"></label>
+        <button type="submit">Login</button>
+      </form>
+      <p id="loginMessage" class="message"></p>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <header class="topbar">
+        <div><strong>Clothing Hub Egypt</strong><span>Admin Dashboard</span></div>
+        <button id="logoutBtn" class="secondary">Logout</button>
+      </header>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Add / Edit Product</h2>
+          <form id="productForm">
+            <input id="productId" type="hidden">
+            <label>Product name<input id="productName" required></label>
+            <label>Category<input id="productCategory" required placeholder="Men, Women, Kids..."></label>
+            <label>Price<input id="productPrice" required placeholder="$12.00"></label>
+            <label>Image filename<input id="productImage" required placeholder="product-men-tshirt.jpg"></label>
+            <label>Description<textarea id="productDescription"></textarea></label>
+            <div class="row">
+              <button type="submit">Save Product</button>
+              <button type="button" id="cancelEdit" class="secondary">Clear</button>
+            </div>
+          </form>
+          <p id="productMessage" class="message"></p>
+        </section>
+
+        <section class="panel">
+          <div class="sectionHead"><h2>Products</h2><button id="refreshProducts" class="secondary">Refresh</button></div>
+          <div id="productsList" class="list"></div>
+        </section>
+
+        <section class="panel full">
+          <div class="sectionHead"><h2>Affiliate Applications</h2><button id="refreshAffiliates" class="secondary">Refresh</button></div>
+          <div id="affiliateList" class="list"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script src="admin.js"></script>
+</body>
+</html>

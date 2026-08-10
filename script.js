@@ -1291,42 +1291,42 @@ ${message}`
                 name: "Denim Jackets",
                 category: "Denim",
                 price: "$13.00",
-                image: "denim-jacket.jpg"
+                image: "images/denim-jacket.jpg"
             },
 
             {
                 name: "Jeans",
                 category: "Denim",
                 price: "$11.00",
-                image: "jeans.jpg"
+                image: "images/jeans.jpg"
             },
 
             {
                 name: "Ties",
                 category: "Accessories",
                 price: "$4.00",
-                image: "ties.jpg"
+                image: "images/ties.jpg"
             },
 
             {
                 name: "Belts",
                 category: "Accessories",
                 price: "$5.00",
-                image: "belts.jpg"
+                image: "images/belts.jpg"
             },
 
             {
                 name: "Women's Purses",
                 category: "Accessories",
                 price: "$9.00",
-                image: "womens-purses.jpg"
+                image: "images/womens-purses.jpg"
             },
 
             {
                 name: "Sportswear",
                 category: "Sports",
                 price: "$9.00",
-                image: "sportswear.jpg"
+                image: "images/sportswear.jpg"
             }
 
         ];
@@ -1557,4 +1557,4 @@ ${audience}`
         "Premium wholesale export website loaded successfully."
     );
 
-}); 
+});

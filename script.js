@@ -1291,42 +1291,42 @@ ${message}`
                 name: "Denim Jackets",
                 category: "Denim",
                 price: "$13.00",
-                image: "images/denim-jacket.jpg"
+                image: "denim-jacket.jpg"
             },
 
             {
                 name: "Jeans",
                 category: "Denim",
                 price: "$11.00",
-                image: "images/jeans.jpg"
+                image: "jeans.jpg"
             },
 
             {
                 name: "Ties",
                 category: "Accessories",
                 price: "$4.00",
-                image: "images/ties.jpg"
+                image: "ties.jpg"
             },
 
             {
                 name: "Belts",
                 category: "Accessories",
                 price: "$5.00",
-                image: "images/belts.jpg"
+                image: "belts.jpg"
             },
 
             {
                 name: "Women's Purses",
                 category: "Accessories",
                 price: "$9.00",
-                image: "images/womens-purses.jpg"
+                image: "womens-purses.jpg"
             },
 
             {
                 name: "Sportswear",
                 category: "Sports",
                 price: "$9.00",
-                image: "images/sportswear.jpg"
+                image: "sportswear.jpg"
             }
 
         ];
@@ -1556,266 +1556,5 @@ ${audience}`
     console.log(
         "Premium wholesale export website loaded successfully."
     );
-
-    /* =====================================================
-       26 — DEPLOYMENT-SAFE IMAGES + LIGHTBOX
-    ===================================================== */
-    const showImageLightbox = (src, alt = "Product image") => {
-        if (!src) return;
-        let box = document.querySelector(".image-lightbox");
-        if (!box) {
-            box = document.createElement("div");
-            box.className = "image-lightbox";
-            box.innerHTML = `
-                <button class="lightbox-close" type="button" aria-label="Close image">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <img alt="">
-                <div class="lightbox-caption"></div>
-            `;
-            document.body.appendChild(box);
-            box.addEventListener("click", e => {
-                if (e.target === box || e.target.closest(".lightbox-close")) box.classList.remove("open");
-            });
-        }
-        const image = box.querySelector("img");
-        const caption = box.querySelector(".lightbox-caption");
-        image.src = src;
-        image.alt = alt;
-        caption.textContent = alt;
-        box.classList.add("open");
-    };
-
-    document.querySelectorAll(".product-image img").forEach(img => {
-        img.addEventListener("click", e => {
-            e.stopPropagation();
-            showImageLightbox(img.currentSrc || img.src, img.alt || "Product image");
-        });
-        img.addEventListener("error", () => {
-            if (img.dataset.fallbackTried !== "1") {
-                img.dataset.fallbackTried = "1";
-                const raw = img.getAttribute("src") || "";
-                const clean = raw.replace(/^\.\//, "");
-                img.src = "/" + clean;
-                return;
-            }
-            const wrapper = img.closest(".product-image");
-            if (wrapper && !wrapper.querySelector(".image-error-placeholder")) {
-                img.style.display = "none";
-                const ph = document.createElement("div");
-                ph.className = "image-error-placeholder";
-                ph.textContent = "Image not found — check the /images/ folder and filename case.";
-                wrapper.appendChild(ph);
-            }
-        });
-    });
-
-    /* =====================================================
-       27 — AUTH + AFFILIATE OTP / EMAIL
-       Real account/OTP requires Supabase project credentials.
-       Put URL + anon key below, then enable Email Auth in Supabase.
-    ===================================================== */
-    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-    let supabaseClient = null;
-    let currentUser = null;
-
-    const createAccountUI = () => {
-        if (document.querySelector(".account-modal")) return;
-        const modal = document.createElement("div");
-        modal.className = "account-modal";
-        modal.innerHTML = `
-            <div class="account-panel">
-                <button class="account-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-                <div class="section-eyebrow"><span></span> MEMBER ACCOUNT</div>
-                <h3>Buyer & Contributor Account</h3>
-                <p>Sign in with email/password or request a one-time email OTP. Affiliate applications can be submitted after verification.</p>
-                <div class="account-tabs">
-                    <button class="account-tab active" data-auth-tab="login" type="button">Login</button>
-                    <button class="account-tab" data-auth-tab="signup" type="button">Sign Up</button>
-                    <button class="account-tab" data-auth-tab="otp" type="button">Email OTP</button>
-                </div>
-                <form id="accountForm">
-                    <div class="account-field"><label for="accountEmail">EMAIL</label><input id="accountEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
-                    <div class="account-field" id="passwordField"><label for="accountPassword">PASSWORD</label><input id="accountPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Minimum 6 characters"></div>
-                    <div class="account-actions">
-                        <button class="btn btn-dark" type="submit" id="accountSubmit">Login <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                </form>
-                <div class="account-user" id="accountUser" hidden></div>
-                <button class="btn btn-primary" id="accountLogout" type="button" hidden>Logout</button>
-                <div class="account-status" id="accountStatus"></div>
-            </div>`;
-        document.body.appendChild(modal);
-
-        const status = modal.querySelector("#accountStatus");
-        const tabs = [...modal.querySelectorAll("[data-auth-tab]")];
-        const passwordField = modal.querySelector("#passwordField");
-        const submit = modal.querySelector("#accountSubmit");
-        const form = modal.querySelector("#accountForm");
-        let mode = "login";
-
-        const setStatus = (text, ok = false) => {
-            status.textContent = text;
-            status.classList.add("show");
-            status.style.borderLeft = ok ? "3px solid #4d8b62" : "3px solid #a98252";
-        };
-        const setMode = next => {
-            mode = next;
-            tabs.forEach(t => t.classList.toggle("active", t.dataset.authTab === next));
-            passwordField.style.display = next === "otp" ? "none" : "block";
-            submit.innerHTML = next === "login" ? 'Login <i class="fa-solid fa-arrow-right"></i>' : next === "signup" ? 'Create Account <i class="fa-solid fa-arrow-right"></i>' : 'Send OTP <i class="fa-solid fa-envelope"></i>';
-        };
-        tabs.forEach(t => t.addEventListener("click", () => setMode(t.dataset.authTab)));
-        modal.querySelector(".account-close").addEventListener("click", () => modal.classList.remove("open"));
-        modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
-
-        form.addEventListener("submit", async e => {
-            e.preventDefault();
-            if (!supabaseClient) {
-                setStatus("Account/OTP is ready in the website code, but Supabase is not configured yet. Add your Supabase URL and anon key in script.js.");
-                return;
-            }
-            const email = modal.querySelector("#accountEmail").value.trim();
-            const password = modal.querySelector("#accountPassword").value;
-            try {
-                let result;
-                if (mode === "signup") {
-                    result = await supabaseClient.auth.signUp({ email, password });
-                    setStatus("Account created. Check your email if email confirmation is enabled.", true);
-                } else if (mode === "otp") {
-                    result = await supabaseClient.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
-                    setStatus("OTP / magic-link email sent. Open your email to continue.", true);
-                } else {
-                    result = await supabaseClient.auth.signInWithPassword({ email, password });
-                    if (result.error) throw result.error;
-                    currentUser = result.data.user;
-                    setStatus(`Signed in as ${currentUser.email}`, true);
-                    updateAccountButton();
-                    setTimeout(() => modal.classList.remove("open"), 900);
-                }
-                if (result?.error) throw result.error;
-            } catch (err) {
-                setStatus(err.message || "Authentication failed.");
-            }
-        });
-
-        modal.querySelector("#accountLogout").addEventListener("click", async () => {
-            if (supabaseClient) await supabaseClient.auth.signOut();
-            currentUser = null;
-            updateAccountButton();
-            renderAccountState();
-        });
-
-        window.openAccountModal = () => {
-            modal.classList.add("open");
-            renderAccountState();
-        };
-        window.setAccountStatus = setStatus;
-        window.renderAccountState = () => {
-            const userBox = modal.querySelector("#accountUser");
-            const logout = modal.querySelector("#accountLogout");
-            if (currentUser) {
-                userBox.hidden = false;
-                userBox.textContent = `Signed in: ${currentUser.email}`;
-                logout.hidden = false;
-            } else {
-                userBox.hidden = true;
-                logout.hidden = true;
-            }
-        };
-    };
-
-    const updateAccountButton = () => {
-        const btn = document.querySelector("#accountNavBtn");
-        if (!btn) return;
-        btn.innerHTML = currentUser ? '<i class="fa-solid fa-user-check"></i><span>Account</span>' : '<i class="fa-regular fa-user"></i><span>Account</span>';
-    };
-
-    createAccountUI();
-    const accountBtn = document.querySelector("#accountNavBtn");
-    if (accountBtn) accountBtn.addEventListener("click", () => window.openAccountModal());
-
-    if (SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY") {
-        const loadSupabase = () => {
-            if (window.supabase) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                supabaseClient.auth.getSession().then(({ data }) => {
-                    currentUser = data.session?.user || null;
-                    updateAccountButton();
-                });
-                supabaseClient.auth.onAuthStateChange((_event, session) => {
-                    currentUser = session?.user || null;
-                    updateAccountButton();
-                    if (typeof renderAccountState === "function") renderAccountState();
-                });
-                return;
-            }
-            const s = document.createElement("script");
-            s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-            s.onload = loadSupabase;
-            s.onerror = () => console.warn("Supabase library failed to load.");
-            document.head.appendChild(s);
-        };
-        loadSupabase();
-    }
-
-    /* =====================================================
-       28 — AFFILIATE APPLICATION: REQUIRE ACCOUNT + SAVE TO DB
-       Table: affiliate_applications
-    ===================================================== */
-    if (affiliateForm) {
-        const originalAffiliateHandler = affiliateForm.cloneNode(true);
-        // Replace the old mailto-only submit handler with a real async handler.
-        affiliateForm.replaceWith(originalAffiliateHandler);
-        const realAffiliateForm = document.getElementById("affiliateForm");
-        const affiliateMessage2 = document.getElementById("affiliateMessage");
-        realAffiliateForm.addEventListener("submit", async event => {
-            event.preventDefault();
-            if (!supabaseClient) {
-                if (window.openAccountModal) window.openAccountModal();
-                if (window.setAccountStatus) window.setAccountStatus("Please configure Supabase in script.js first. This is required for real login, OTP and affiliate submissions.");
-                return;
-            }
-            const { data: sessionData } = await supabaseClient.auth.getSession();
-            const user = sessionData.session?.user;
-            if (!user) {
-                if (window.openAccountModal) window.openAccountModal();
-                if (window.setAccountStatus) window.setAccountStatus("Please create or sign in to your account before submitting the affiliate application.");
-                return;
-            }
-            const payload = {
-                user_id: user.id,
-                name: document.getElementById("affiliateName")?.value.trim(),
-                email: document.getElementById("affiliateEmail")?.value.trim() || user.email,
-                whatsapp: document.getElementById("affiliateWhatsapp")?.value.trim(),
-                country: document.getElementById("affiliateCountry")?.value.trim(),
-                promotion_method: document.getElementById("affiliateMethod")?.value,
-                audience: document.getElementById("affiliateAudience")?.value.trim(),
-                status: "pending"
-            };
-            try {
-                const { error } = await supabaseClient.from("affiliate_applications").insert(payload);
-                if (error) throw error;
-                affiliateMessage2.textContent = "Application submitted successfully. We will review it and contact you by email/WhatsApp.";
-                affiliateMessage2.classList.add("show");
-                realAffiliateForm.reset();
-            } catch (err) {
-                affiliateMessage2.textContent = err.message || "Could not submit application.";
-                affiliateMessage2.classList.add("show");
-            }
-        });
-    }
-
-    /* =====================================================
-       29 — IMAGE URL NORMALIZATION
-       Keep image folder next to index.html during deployment.
-    ===================================================== */
-    document.querySelectorAll("img[src]").forEach(img => {
-        const src = img.getAttribute("src");
-        if (src && !src.startsWith("http") && !src.startsWith("data:") && !src.startsWith("/")) {
-            img.setAttribute("src", "./" + src.replace(/^\.\//, ""));
-        }
-    });
 
 });

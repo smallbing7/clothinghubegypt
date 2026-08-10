@@ -1557,4 +1557,5 @@ ${audience}`
         "Premium wholesale export website loaded successfully."
     );
 
-});
+}); const SUPABASE_URL = "https://qnsljfdaqfebpcsbehpm.supabase.co/rest/v1/";
+const SUPABASE_ANON_KEY = "sb_publishable_DKheV3t2LIRqxwYbBOhpbw_S8P-eg2q;

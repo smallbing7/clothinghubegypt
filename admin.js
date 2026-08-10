@@ -4,8 +4,9 @@
   3) Run supabase-setup.sql in Supabase SQL Editor.
   4) Create your admin user in Supabase Authentication > Users.
 */
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY";
+const SUPABASE_URL = "https://qnsljfdaqfebpcsbehpm.supabase.co/rest/v1/";
+const SUPABASE_ANON_KEY = "sb_publishable_DKheV3t2LIRqxwYbBOhpbw_S8P-eg2q;
+
 
 const configured = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
 const client = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;

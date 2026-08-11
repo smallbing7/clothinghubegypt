@@ -1371,60 +1371,83 @@ ${message}`
     }
 
 
-    /* =====================================================
-       24 — AFFILIATE APPLICATION + EMAIL OTP
-    ===================================================== */
-    const affiliateForm = document.getElementById("affiliateForm");
-    const affiliateMessage = document.getElementById("affiliateMessage");
-    const affiliateOtpBox = document.getElementById("affiliateOtpBox");
-    const affiliateOtp = document.getElementById("affiliateOtp");
-    const verifyAffiliateOtp = document.getElementById("verifyAffiliateOtp");
-    let affiliateData = null;
+   /* =====================================================
+   24 — AFFILIATE APPLICATION — DIRECT SUBMIT
+===================================================== */
 
-    const affiliateMsg = text => { if (affiliateMessage) { affiliateMessage.textContent = text; affiliateMessage.classList.add("show"); } };
+const affiliateForm = document.getElementById("affiliateForm");
+const affiliateMessage = document.getElementById("affiliateMessage");
 
-    if (affiliateForm) {
-        affiliateForm.addEventListener("submit", async event => {
-            event.preventDefault();
-            const data = {
-                name: document.getElementById("affiliateName")?.value.trim() || "",
-                email: document.getElementById("affiliateEmail")?.value.trim() || "",
-                whatsapp: document.getElementById("affiliateWhatsapp")?.value.trim() || "",
-                country: document.getElementById("affiliateCountry")?.value.trim() || "",
-                promotion_method: document.getElementById("affiliateMethod")?.value || "",
-                audience: document.getElementById("affiliateAudience")?.value.trim() || ""
-            };
-            if (!data.name || !data.email || !data.whatsapp || !data.country || !data.promotion_method || !data.audience || !document.getElementById("affiliateTerms")?.checked) {
-                affiliateMsg("Please complete all required fields and accept the terms."); return;
-            }
-            if (!supabaseClient) { affiliateMsg("Verification service is unavailable. Please try again later."); return; }
-            affiliateData = data;
-            const { error } = await supabaseClient.auth.signInWithOtp({ email: data.email, options: { shouldCreateUser: true } });
-            if (error) { affiliateMsg(error.message); return; }
-            if (affiliateOtpBox) affiliateOtpBox.style.display = "block";
-            affiliateMsg("A 6-digit OTP has been sent to your email. Enter it below.");
-        });
+const affiliateMsg = text => {
+    if (affiliateMessage) {
+        affiliateMessage.textContent = text;
+        affiliateMessage.classList.add("show");
     }
+};
 
-    if (verifyAffiliateOtp) {
-        verifyAffiliateOtp.addEventListener("click", async () => {
-            if (!affiliateData || !affiliateOtp?.value.trim()) { affiliateMsg("Enter the OTP first."); return; }
-            const { error: verifyError } = await supabaseClient.auth.verifyOtp({ email: affiliateData.email, token: affiliateOtp.value.trim(), type: "email" });
-            if (verifyError) { affiliateMsg(verifyError.message); return; }
-            const { error: insertError } = await supabaseClient.from("affiliate_applications").insert(affiliateData);
-            if (insertError) {
-                affiliateMsg("Email verified, but the application could not be saved. Please contact us on WhatsApp.");
+if (affiliateForm) {
+
+    affiliateForm.addEventListener("submit", async event => {
+
+        event.preventDefault();
+
+        const data = {
+            name: document.getElementById("affiliateName")?.value.trim() || "",
+            email: document.getElementById("affiliateEmail")?.value.trim() || "",
+            whatsapp: document.getElementById("affiliateWhatsapp")?.value.trim() || "",
+            country: document.getElementById("affiliateCountry")?.value.trim() || "",
+            promotion_method: document.getElementById("affiliateMethod")?.value || "",
+            audience: document.getElementById("affiliateAudience")?.value.trim() || ""
+        };
+
+        if (
+            !data.name ||
+            !data.email ||
+            !data.whatsapp ||
+            !data.country ||
+            !data.promotion_method ||
+            !data.audience ||
+            !document.getElementById("affiliateTerms")?.checked
+        ) {
+            affiliateMsg(
+                "Please complete all required fields and accept the terms."
+            );
+            return;
+        }
+
+        /* Save application directly */
+        if (supabaseClient) {
+
+            const { error } = await supabaseClient
+                .from("affiliate_applications")
+                .insert(data);
+
+            if (error) {
+                console.error("Affiliate application error:", error);
+
+                affiliateMsg(
+                    "Application could not be submitted. Please contact us on WhatsApp."
+                );
+
                 return;
             }
-            sendFormEmail(affiliateData, "New Verified Affiliate Application — Clothing Hub Egypt");
-            affiliateMsg("Verified! Your affiliate application has been submitted successfully.");
-            affiliateForm.reset();
-            if (affiliateOtpBox) affiliateOtpBox.style.display = "none";
-            affiliateData = null;
-            await supabaseClient.auth.signOut();
-        });
-    }
+        }
 
+        /* Send application details to business email */
+        sendFormEmail(
+            data,
+            "New Affiliate Application — Clothing Hub Egypt"
+        );
+
+        affiliateMsg(
+            "Application submitted successfully. We will contact you soon."
+        );
+
+        affiliateForm.reset();
+
+    });
+
+}
 
     /* =====================================================
        25 — INITIAL PRODUCT STATE

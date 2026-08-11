@@ -716,6 +716,12 @@
         </div>
 
 
+        <div style="margin: 0 0 24px; display:flex; justify-content:flex-end;">
+            <a href="./catalogue.pdf" class="btn btn-primary" download>
+                Download Catalogue PDF <i class="fa-solid fa-download"></i>
+            </a>
+        </div>
+
         <!-- SEARCH + FILTER -->
 
         <div class="catalogue-controls">
@@ -797,7 +803,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-men-tshirt.jpg"
+                        src="product-men-tshirt.jpg"
                         alt="Wholesale men's t-shirts"
                         loading="lazy"
                     >
@@ -851,7 +857,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-men-polo.jpg"
+                        src="product-men-polo.jpg"
                         alt="Wholesale men's polo shirts"
                         loading="lazy"
                     >
@@ -905,7 +911,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-men-shirt.jpg"
+                        src="product-men-shirt.jpg"
                         alt="Wholesale men's shirts"
                         loading="lazy"
                     >
@@ -959,7 +965,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-men-pants.jpg"
+                        src="product-men-pants.jpg"
                         alt="Wholesale men's trousers"
                         loading="lazy"
                     >
@@ -1013,7 +1019,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-women-dress.jpg"
+                        src="product-women-dress.jpg"
                         alt="Wholesale women's dresses"
                         loading="lazy"
                     >
@@ -1067,7 +1073,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-women-top.jpg"
+                        src="product-women-top.jpg"
                         alt="Wholesale women's tops"
                         loading="lazy"
                     >
@@ -1121,7 +1127,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-kids.jpg"
+                        src="product-kids.jpg"
                         alt="Wholesale kids clothing"
                         loading="lazy"
                     >
@@ -1175,7 +1181,7 @@
                 <div class="product-image">
 
                     <img
-                        src="images/product-bulk.jpg"
+                        src="product-bulk.jpg"
                         alt="Bulk wholesale clothing"
                         loading="lazy"
                     >
@@ -2430,6 +2436,7 @@
      JAVASCRIPT
 ===================================================== -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./script.js"></script>
 
 <!-- =====================================================
@@ -2677,6 +2684,12 @@
 
                 </div>
 
+
+                <div id="affiliateOtpBox" class="affiliate-field" style="display:none; margin-top:16px;">
+                    <label for="affiliateOtp">EMAIL OTP</label>
+                    <input id="affiliateOtp" type="text" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit OTP">
+                    <button type="button" id="verifyAffiliateOtp" class="btn btn-dark" style="margin-top:10px;">Verify OTP</button>
+                </div>
 
                 <button
                     type="submit"

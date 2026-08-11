@@ -4,9 +4,8 @@
   3) Run supabase-setup.sql in Supabase SQL Editor.
   4) Create your admin user in Supabase Authentication > Users.
 */
-const SUPABASE_URL = "https://qnsljfdaqfebpcsbehpm.supabase.co/rest/v1/";
-const SUPABASE_ANON_KEY = "sb_publishable_DKheV3t2LIRqxwYbBOhpbw_S8P-eg2q;
-
+const SUPABASE_URL = "https://qnsljfdaqfebpcsbehpm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_DKheV3t2LIRqxwYbBOhpbw_S8P-eg2q";
 
 const configured = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
 const client = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -30,7 +29,7 @@ async function requireAdmin() {
   }
   $("loginPanel").classList.add("hidden");
   $("dashboard").classList.remove("hidden");
-  await Promise.all([loadProducts(), loadAffiliates()]);
+  await Promise.all([loadProducts(), loadAffiliates(), loadQuotes()]);
 }
 
 $("loginForm").addEventListener("submit", async e => {

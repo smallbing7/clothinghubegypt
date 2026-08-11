@@ -5,6 +5,39 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    /* PUBLIC SUPABASE CONFIG — publishable key is safe for browser use. */
+    const SUPABASE_URL = "https://qnsljfdaqfebpcsbehpm.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_DKheV3t2LIRqxwYbBOhpbw_S8P-eg2q";
+    const supabaseClient = (window.supabase && SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY)
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+        : null;
+
+    const sendFormEmail = (payload, subject) => {
+        const iframe = document.createElement("iframe");
+        iframe.name = "formsubmit_target_" + Date.now();
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "https://formsubmit.co/clothinghubegypt4@gmail.com";
+        form.target = iframe.name;
+        form.style.display = "none";
+        const fields = {
+            _subject: subject,
+            _captcha: "false",
+            _template: "table",
+            ...payload
+        };
+        Object.entries(fields).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden"; input.name = key; input.value = value ?? "";
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(() => { form.remove(); iframe.remove(); }, 5000);
+    };
+
     /* =====================================================
        01 — LOADER
     ===================================================== */
@@ -558,89 +591,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (inquiryForm) {
-
-        inquiryForm.addEventListener(
-            "submit",
-            event => {
-
-                event.preventDefault();
-
-
-                const formData =
-                    new FormData(inquiryForm);
-
-
-                const name =
-                    formData.get("name") || "";
-
-                const company =
-                    formData.get("company") || "";
-
-                const email =
-                    formData.get("email") || "";
-
-                const country =
-                    formData.get("country") || "";
-
-                const product =
-                    formData.get("product") || "";
-
-                const quantity =
-                    formData.get("quantity") || "";
-
-                const message =
-                    formData.get("message") || "";
-
-
-                const whatsappMessage =
-`Hello Clothing Hub Egypt,
-
-I would like to make a wholesale inquiry.
-
-Name: ${name}
-Company: ${company}
-Email: ${email}
-Country: ${country}
-Product: ${product}
-Quantity: ${quantity}
-
-Message:
-${message}
-
-Please share your best wholesale price, MOQ, available options and shipping details.`;
-
-
-                const whatsappURL =
-                    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-                        whatsappMessage
-                    )}`;
-
-
-                window.open(
-                    whatsappURL,
-                    "_blank"
-                );
-
-
-                const formMessage =
-                    document.querySelector(
-                        ".form-message"
-                    );
-
-
-                if (formMessage) {
-
-                    formMessage.textContent =
-                        "Opening WhatsApp inquiry...";
-
-                    formMessage.className =
-                        "form-message success";
-
-                }
-
+        inquiryForm.addEventListener("submit", event => {
+            event.preventDefault();
+            const data = Object.fromEntries(new FormData(inquiryForm).entries());
+            const whatsappMessage = `Hello Clothing Hub Egypt,\nI would like to make a wholesale inquiry.\n\nName: ${data.name || ""}\nCompany: ${data.company || ""}\nEmail: ${data.email || ""}\nCountry: ${data.country || ""}\nProduct: ${data.product || ""}\nQuantity: ${data.quantity || ""}\n\nMessage:\n${data.message || ""}\n\nPlease share your best wholesale price, MOQ, available options and shipping details.`;
+            const formMessage = document.querySelector(".form-message");
+            sendFormEmail(data, "New Quote Request — Clothing Hub Egypt");
+            if (supabaseClient) {
+                supabaseClient.from("quote_requests").insert({
+                    name: data.name || "", company: data.company || "", email: data.email || "",
+                    country: data.country || "", product: data.product || "", quantity: data.quantity || "",
+                    message: data.message || ""
+                }).catch(() => {});
             }
-        );
-
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`, "_blank", "noopener");
+            if (formMessage) {
+                formMessage.textContent = "Quote sent. WhatsApp opened and your inquiry was emailed.";
+                formMessage.className = "form-message success";
+            }
+            inquiryForm.reset();
+        });
     }
 
 
@@ -1291,42 +1261,42 @@ ${message}`
                 name: "Denim Jackets",
                 category: "Denim",
                 price: "$13.00",
-                image: "images/denim-jacket.jpg"
+                image: "denim-jacket.jpg"
             },
 
             {
                 name: "Jeans",
                 category: "Denim",
                 price: "$11.00",
-                image: "images/jeans.jpg"
+                image: "jeans.jpg"
             },
 
             {
                 name: "Ties",
                 category: "Accessories",
                 price: "$4.00",
-                image: "images/ties.jpg"
+                image: "ties.jpg"
             },
 
             {
                 name: "Belts",
                 category: "Accessories",
                 price: "$5.00",
-                image: "images/belts.jpg"
+                image: "belts.jpg"
             },
 
             {
                 name: "Women's Purses",
                 category: "Accessories",
                 price: "$9.00",
-                image: "images/womens-purses.jpg"
+                image: "womens-purses.jpg"
             },
 
             {
                 name: "Sportswear",
                 category: "Sports",
                 price: "$9.00",
-                image: "images/sportswear.jpg"
+                image: "sportswear.jpg"
             }
 
         ];
@@ -1402,130 +1372,57 @@ ${message}`
 
 
     /* =====================================================
-       24 — AFFILIATE APPLICATION
+       24 — AFFILIATE APPLICATION + EMAIL OTP
     ===================================================== */
+    const affiliateForm = document.getElementById("affiliateForm");
+    const affiliateMessage = document.getElementById("affiliateMessage");
+    const affiliateOtpBox = document.getElementById("affiliateOtpBox");
+    const affiliateOtp = document.getElementById("affiliateOtp");
+    const verifyAffiliateOtp = document.getElementById("verifyAffiliateOtp");
+    let affiliateData = null;
 
-    const affiliateForm =
-        document.getElementById(
-            "affiliateForm"
-        );
-
-
-    const affiliateMessage =
-        document.getElementById(
-            "affiliateMessage"
-        );
-
+    const affiliateMsg = text => { if (affiliateMessage) { affiliateMessage.textContent = text; affiliateMessage.classList.add("show"); } };
 
     if (affiliateForm) {
-
-        affiliateForm.addEventListener(
-            "submit",
-            event => {
-
-                event.preventDefault();
-
-
-                const name =
-                    document.getElementById(
-                        "affiliateName"
-                    )?.value.trim() || "";
-
-
-                const email =
-                    document.getElementById(
-                        "affiliateEmail"
-                    )?.value.trim() || "";
-
-
-                const whatsapp =
-                    document.getElementById(
-                        "affiliateWhatsapp"
-                    )?.value.trim() || "";
-
-
-                const country =
-                    document.getElementById(
-                        "affiliateCountry"
-                    )?.value.trim() || "";
-
-
-                const method =
-                    document.getElementById(
-                        "affiliateMethod"
-                    )?.value || "";
-
-
-                const audience =
-                    document.getElementById(
-                        "affiliateAudience"
-                    )?.value.trim() || "";
-
-
-                if (
-                    !name ||
-                    !email ||
-                    !whatsapp ||
-                    !country ||
-                    !method ||
-                    !audience
-                ) {
-
-                    if (affiliateMessage) {
-
-                        affiliateMessage.textContent =
-                            "Please complete all required fields.";
-
-                        affiliateMessage.classList.add(
-                            "show"
-                        );
-
-                    }
-
-                    return;
-
-                }
-
-
-                const subject =
-                    encodeURIComponent(
-                        "New Clothing Hub Egypt Affiliate Application"
-                    );
-
-
-                const body =
-                    encodeURIComponent(
-`AFFILIATE APPLICATION
-
-Name: ${name}
-Email: ${email}
-WhatsApp: ${whatsapp}
-Country: ${country}
-Promotion Method: ${method}
-
-Audience / Network:
-${audience}`
-                    );
-
-
-                window.location.href =
-                    `mailto:${businessEmail}?subject=${subject}&body=${body}`;
-
-
-                if (affiliateMessage) {
-
-                    affiliateMessage.textContent =
-                        "Your email application window will now open.";
-
-                    affiliateMessage.classList.add(
-                        "show"
-                    );
-
-                }
-
+        affiliateForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const data = {
+                name: document.getElementById("affiliateName")?.value.trim() || "",
+                email: document.getElementById("affiliateEmail")?.value.trim() || "",
+                whatsapp: document.getElementById("affiliateWhatsapp")?.value.trim() || "",
+                country: document.getElementById("affiliateCountry")?.value.trim() || "",
+                promotion_method: document.getElementById("affiliateMethod")?.value || "",
+                audience: document.getElementById("affiliateAudience")?.value.trim() || ""
+            };
+            if (!data.name || !data.email || !data.whatsapp || !data.country || !data.promotion_method || !data.audience || !document.getElementById("affiliateTerms")?.checked) {
+                affiliateMsg("Please complete all required fields and accept the terms."); return;
             }
-        );
+            if (!supabaseClient) { affiliateMsg("Verification service is unavailable. Please try again later."); return; }
+            affiliateData = data;
+            const { error } = await supabaseClient.auth.signInWithOtp({ email: data.email, options: { shouldCreateUser: true } });
+            if (error) { affiliateMsg(error.message); return; }
+            if (affiliateOtpBox) affiliateOtpBox.style.display = "block";
+            affiliateMsg("A 6-digit OTP has been sent to your email. Enter it below.");
+        });
+    }
 
+    if (verifyAffiliateOtp) {
+        verifyAffiliateOtp.addEventListener("click", async () => {
+            if (!affiliateData || !affiliateOtp?.value.trim()) { affiliateMsg("Enter the OTP first."); return; }
+            const { error: verifyError } = await supabaseClient.auth.verifyOtp({ email: affiliateData.email, token: affiliateOtp.value.trim(), type: "email" });
+            if (verifyError) { affiliateMsg(verifyError.message); return; }
+            const { error: insertError } = await supabaseClient.from("affiliate_applications").insert(affiliateData);
+            if (insertError) {
+                affiliateMsg("Email verified, but the application could not be saved. Please contact us on WhatsApp.");
+                return;
+            }
+            sendFormEmail(affiliateData, "New Verified Affiliate Application — Clothing Hub Egypt");
+            affiliateMsg("Verified! Your affiliate application has been submitted successfully.");
+            affiliateForm.reset();
+            if (affiliateOtpBox) affiliateOtpBox.style.display = "none";
+            affiliateData = null;
+            await supabaseClient.auth.signOut();
+        });
     }
 
 

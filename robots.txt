@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://smallbing7.github.io/clothinghubegypt/sitemap.xml

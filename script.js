@@ -6,9 +6,19 @@ const products=[...document.querySelectorAll('.product,.product-card')],filters=
 function refresh(){const term=(searchInput?.value||'').trim().toLowerCase(),active=document.querySelector('.filter.active,.filter-btn.active')?.dataset.filter||'all';products.forEach(card=>{const cat=(card.dataset.category||'').toLowerCase(),text=card.textContent.toLowerCase();card.style.display=(active==='all'||cat===active)&&(!term||text.includes(term))?'':'none'})}
 filters.forEach(b=>b.addEventListener('click',()=>{filters.forEach(x=>x.classList.remove('active'));b.classList.add('active');refresh()}));searchInput?.addEventListener('input',refresh);
 
-// Use the newly uploaded GitHub images directly so they appear on the live catalogue.
-const uploadedImages=['download.jpeg','download (1).jpeg','download (2).jpeg','download (3).jpeg','download (4).jpeg'];
-products.slice(0,uploadedImages.length).forEach((card,i)=>{const img=card.querySelector('.product-image img,.product-img img');if(img){img.src=uploadedImages[i];img.removeAttribute('srcset');img.loading='lazy';}});
+// Explicit product mapping. Do not map images by upload order.
+const imageMap={
+  'mens-tshirt':'Gamer Spirit T-Shirt _ Minimal Gaming Shirt.jpeg',
+  'mens-polo':'Men Colourblock Regular Fit Polo T-Shirt.jpeg',
+  'mens-shirt':"download (3).jpeg",
+  'mens-jeans':'Jack & Jones gy fit JJIALEX JJNORREBRO SQ 400 LN - Jeansy Straight Leg - blue denim.jpeg',
+  'mens-cargo':'download (1).jpeg'
+};
+Object.entries(imageMap).forEach(([product,file])=>{
+  const card=document.querySelector(`a[href="product.html?product=${product}"]`);
+  const img=card?.querySelector('.product-img img');
+  if(img){img.src=file;img.removeAttribute('srcset');img.loading='lazy';}
+});
 
 document.querySelectorAll('.quick').forEach(button=>button.addEventListener('click',()=>{const product=button.dataset.product||'product';window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hello Clothing Hub Egypt, I am interested in ${product}. Please send me the current wholesale price, MOQ, available options and shipping details.`)}`,'_blank','noopener,noreferrer')}));
 const form=document.getElementById('inquiryForm');form?.addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(form).entries());const msg=`Hello Clothing Hub Egypt, I would like a wholesale quotation.\n\nName: ${d.name||''}\nCompany: ${d.company||''}\nEmail: ${d.email||''}\nCountry: ${d.country||''}\nProduct: ${d.product||''}\nQuantity: ${d.quantity||''}\nRequirements: ${d.message||''}`;window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`,'_blank','noopener,noreferrer');form.reset()});

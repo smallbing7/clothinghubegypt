@@ -1,1 +1,0 @@
-Category routing: catalogue covers open only their matching Men collection; individual Jeans products use separate product detail keys.

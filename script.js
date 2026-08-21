@@ -47,3 +47,24 @@ const form=document.getElementById('inquiryForm');form?.addEventListener('submit
 const footer=document.querySelector('footer');if(footer){const cols=footer.querySelectorAll('.footer-top>div');if(cols.length>=4){cols[2].innerHTML='<b>Customer Information</b><a href="#about">About Us</a><a href="#faq">FAQ</a><a href="shipping-policy.html">Shipping Policy</a><a href="refund-cancellation.html">Refund & Cancellation</a><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms & Conditions</a>';cols[3].innerHTML=`<b>Contact</b><a href="mailto:${email}">${email}</a><a href="#inquiry">Wholesale Inquiry</a><span>International wholesale support</span>`;}}
 refresh();
 });
+
+/* Clickable payment options with full details */
+document.addEventListener('DOMContentLoaded',()=>{
+ const cards=document.querySelectorAll('#payment .payment-cards article');
+ const details=[
+  {title:'Bank Transfer',label:'T/T • WHOLESALE',text:'International bank transfer is available for confirmed wholesale orders. After your quotation is approved, we provide the applicable invoice and bank transfer instructions. Bank details are shared only through the confirmed order process.',items:['Suitable for wholesale and bulk orders','Payment instructions provided with the confirmed invoice','Order moves forward after payment confirmation']},
+  {title:'PayPal',label:'ONLINE PAYMENT',text:'PayPal may be available for eligible orders and buyers. Availability, applicable fees and the payable amount are confirmed before payment.',items:['Convenient online payment option','Eligibility confirmed before payment','Final amount confirmed before payment']},
+  {title:'Secure Payment Link',label:'SECURE • ONLINE',text:'For eligible orders, a secure payment link can be provided after the order details and payable amount have been confirmed.',items:['Payment link provided after order confirmation','Amount is confirmed before payment','Use the supplied secure link to complete payment']},
+  {title:'Sample Orders',label:'SAMPLES',text:'Sample orders can be handled separately before a bulk production order. Contact the wholesale team with the product, required quantity and destination.',items:['Samples can be discussed before bulk production','Sample requirements are confirmed first','Bulk order can follow after sample review']}
+ ];
+ cards.forEach((card,i)=>{
+  const d=details[i];
+  card.setAttribute('tabindex','0');
+  card.setAttribute('role','button');
+  card.setAttribute('aria-expanded','false');
+  card.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b><h3>${d.title}</h3><p>${d.text}</p><span class="payment-more">View full details →</span><div class="payment-detail"><strong>${d.label}</strong><ul>${d.items.map(x=>`<li>${x}</li>`).join('')}</ul><a href="#inquiry" class="payment-detail-btn">Request this payment option →</a></div>`;
+  const toggle=()=>{const open=card.classList.toggle('is-open');card.setAttribute('aria-expanded',String(open));};
+  card.addEventListener('click',e=>{if(e.target.closest('.payment-detail-btn'))return;toggle()});
+  card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+ });
+});

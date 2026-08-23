@@ -14,6 +14,14 @@
       "name": "Black leather jacket",
       "price": "30",
       "image": "https://smallbing7.github.io/clothinghubegypt/product-uploads/1787472067949-mark-men-s-black-harrington-lambskin-leather-jacket.jpeg"
+    },
+    {
+      "id": "1787486149755",
+      "section": "shirts",
+      "subcategory": "",
+      "name": "purple men Shirt",
+      "price": "12",
+      "image": "https://smallbing7.github.io/clothinghubegypt/product-uploads/1787486147877-men-regular-fit-solid-spread-collar-casual-shirt.jpeg"
     }
   ]
 }

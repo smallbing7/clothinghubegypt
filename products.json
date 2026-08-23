@@ -1,3 +1,11 @@
 {
-  "products": []
+  "products": [
+    {
+      "id": "1787470920122",
+      "section": "shirts",
+      "name": "Men black shirt",
+      "price": "12",
+      "image": "https://smallbing7.github.io/clothinghubegypt/product-uploads/1787470918493-download.jpeg"
+    }
+  ]
 }
